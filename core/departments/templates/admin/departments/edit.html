@@ -1,0 +1,14 @@
+{% extends "layouts/admin.html" %}
+
+{% block content %}
+  <h2 class="h4 mb-4">Edit Department</h2>
+  <form method="post">
+    {{ form.hidden_tag() }}
+    <div class="mb-3">
+      {{ form.name.label(class="form-label") }}
+      {{ form.name(class="form-control") }}
+    </div>
+    <button type="submit" class="btn btn-primary">Save Changes</button>
+    <a href="{{ url_for('admin.departments.index') }}" class="btn btn-secondary">Cancel</a>
+  </form>
+{% endblock %}

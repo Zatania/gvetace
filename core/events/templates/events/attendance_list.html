@@ -1,0 +1,32 @@
+{% extends "layouts/organizer.html" %}
+
+{% block scripts %}
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script>
+    const ctx = document.getElementById("chart");
+    new Chart(ctx, {
+      type: "bar",
+      data: {
+        labels: {{ names|tojson }},
+        datasets: [
+          {
+            label: "{{ event.name }}",
+            data: {{ attendances|tojson }},
+            borderWidth: 1,
+          },
+        ],
+      },
+      options: {
+        scales: {
+          y: {
+            beginAtZero: true,
+          },
+        },
+      },
+    });
+  </script>
+{% endblock %}
+
+{% block content %}
+  <canvas id="chart"></canvas>
+{% endblock %}

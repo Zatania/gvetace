@@ -1,0 +1,66 @@
+{% extends "layouts/organizer.html" %}
+
+{% block scripts %}
+  <script>
+    new DataTable("#events-table");
+  </script>
+{% endblock %}
+
+{% block content %}
+  <div class="d-flex align-items-end justify-content-between">
+    <h2 class="h4 mb-0 fw-bold">Event Management</h2>
+    <a href="{{ url_for('events.create') }}" class="btn btn-primary">
+      New Event
+    </a>
+  </div>
+
+  <div class="table-responsive mt-3">
+    <table id="events-table" class="table">
+      <thead>
+        <tr>
+          <th>Event</th>
+          <th>Address</th>
+          <th>Date</th>
+          <th>Time In</th>
+          <th>Time Out</th>
+          <th class="text-end">Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for event in events %}
+          <tr>
+            <td>{{ event.name }}</td>
+            <td>{{ event.address }}</td>
+            <td style="white-space: nowrap;">{{ event.date.strftime("%m-%d-%Y") }}</td>
+            <td>{{ event.time_in.strftime("%I:%M %p") }}</td>
+            <td>{{ event.time_out.strftime("%I:%M %p") }}</td>
+            <td class="text-end">
+              <a
+                href="{{ url_for('events.show', event_id=event.id) }}"
+                class="w-100 badge text-bg-success text-decoration-none">
+                Show
+              </a>
+              <a
+                href="#"
+                class="w-100 badge text-bg-danger text-decoration-none">
+                Delete
+              </a>
+            </td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+{% endblock %}
+
+{% block styles %}
+  <style>
+    th {
+      white-space: nowrap;
+    }
+
+    td {
+      vertical-align: middle;
+    }
+  </style>
+{% endblock %}

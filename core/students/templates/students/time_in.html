@@ -1,0 +1,92 @@
+{% extends "layouts/student.html" %}
+
+{% block scripts %}
+{% endblock %}
+
+{% block content %}
+  <div class="mt-3" style="max-width: 32rem;">
+    <header>
+      <h2 class="h4 fw-bold">{{ event.name }}</h2>
+      <p class="mb-0">
+        <span class="fw-bold">Venue</span>: {{ event.address }}
+      </p>
+      <p class="mb-0"><span class="fw-bold">Date</span>: {{ event.date }}</p>
+      <p class="mb-0">
+        <span class="fw-bold">Time In</span>: {{ event.time_in }}
+      </p>
+      <p><span class="fw-bold">Time Out</span>: {{ event.time_out }}</p>
+    </header>
+
+    <form action="" method="post" enctype="multipart/form-data">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+      <div>
+        <label for="time_in_image" class="form-label">Image Attendance</label>
+        <input
+          type="file"
+          name="time_in_image"
+          id="time_in_image"
+          class="form-control"
+          {% for category, message in messages %}
+            {% if message == "Time-out already recorded." %}
+              disabled
+            {% endif %}
+          {% endfor %}
+          required />
+      </div>
+      <div class="mt-3">
+        <a href="/home" class="btn btn-secondary">Cancel</a>
+        <button type="submit" class="btn btn-primary"
+          {% for category, message in messages %}
+            {% if message == "Time-out already recorded." %}
+              disabled
+            {% endif %}
+          {% endfor %} >
+          Submit
+        </button>
+        <button
+          type="button"
+          class="btn btn-success"
+          data-bs-toggle="modal"
+          data-bs-target="#instructionsModal">
+          View Instructions
+        </button>
+      </div>
+    </form>
+  </div>
+
+  <div
+    class="modal fade"
+    id="instructionsModal"
+    tabindex="-1"
+    aria-labelledby="instructionsModalLabel"
+    aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h1 class="modal-title fs-5" id="instructionsModalLabel">
+            Submission Instructions
+          </h1>
+          <button
+            type="button"
+            class="btn-close"
+            data-bs-dismiss="modal"
+            aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <p class="text-muted">
+            Please ensure that Location settings is enabled in your camera app
+            and use the file browser to select your image as Android camera
+            prevents geolocation data from being submitted.
+          </p>
+          <div class="d-flex align-items-center">
+            <img
+              src="{{ url_for('static', filename='images/instructions.png') }}"
+              alt="Submission Instructions"
+              width="100%"
+              height="100%" />
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+{% endblock %}

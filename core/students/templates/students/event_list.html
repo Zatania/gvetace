@@ -1,0 +1,65 @@
+{% extends "layouts/student.html" %}
+
+{% block scripts %}
+  <script>
+    new DataTable("#events-table");
+  </script>
+{% endblock %}
+
+{% block content %}
+  <h2 class="h4 fw-bold">My Events</h2>
+
+  <div class="table-responsive mt-3">
+    <table id="events-table" class="table">
+      <thead>
+        <tr>
+          <th>Event Name</th>
+          <th>Venue</th>
+          <th>Date</th>
+          <th>Time In</th>
+          <th>Time Out</th>
+          <th class="text-end">Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for event in student.events %}
+          <tr>
+            <td>{{ event.name }}</td>
+            <td>{{ event.address }}</td>
+            <td class="nowrap">{{ event.date }}</td>
+            <td>{{ event.time_in }}</td>
+            <td>{{ event.time_out }}</td>
+            <td class="text-end">
+              <a
+                href="{{ url_for('students.time_in', event_id=event.id) }}"
+                class="badge text-bg-success text-decoration-none">
+                Time In
+              </a>
+              <a
+                href="{{ url_for('students.time_out', event_id=event.id) }}"
+                class="badge text-bg-danger text-decoration-none">
+                Time Out
+              </a>
+            </td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+{% endblock %}
+
+{% block styles %}
+  <style>
+    th {
+      white-space: nowrap;
+    }
+
+    td {
+      vertical-align: middle;
+    }
+
+    .nowrap {
+      white-space: nowrap;
+    }
+  </style>
+{% endblock %}

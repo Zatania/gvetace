@@ -1,0 +1,54 @@
+{% extends "layouts/admin.html" %}
+
+{% block scripts %}
+  <script>
+    new DataTable("#organizers-table");
+  </script>
+{% endblock %}
+
+{% block content %}
+  <div class="d-flex align-items-end justify-content-between">
+    <h2 class="h4 mb-0 fw-bold">Organizer Management</h2>
+    <a href="{{ url_for('admin.organizers.create') }}" class="btn btn-primary">
+      New Organizer
+    </a>
+  </div>
+
+  <div class="table-responsive mt-3">
+    <table id="organizers-table" class="data-table table">
+      <thead>
+        <tr>
+          <th>Organizer Name</th>
+          <th>Department</th>
+          <th>Email Address</th>
+          <th class="text-end">Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for organizer in organizers %}
+          <tr>
+            <td>{{ organizer.full_name }}</td>
+            <td>{{ organizer.department.name }}</td>
+            <td>{{ organizer.user.email }}</td>
+            <td class="text-end">
+              <a
+                href="{{ url_for('admin.organizers.edit', organizer_id=organizer.id) }}"
+                class="btn btn-sm btn-warning"
+              >Edit</a>
+
+              <form
+                method="post"
+                action="{{ url_for('admin.organizers.delete', organizer_id=organizer.id) }}"
+                class="d-inline"
+                onsubmit="return confirm('Delete this organizer?');"
+              >
+                {{ delete_form.hidden_tag() }}
+                <button type="submit" class="btn btn-sm btn-danger">Delete</button>
+              </form>
+            </td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+{% endblock %}

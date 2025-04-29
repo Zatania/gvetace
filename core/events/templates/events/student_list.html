@@ -1,0 +1,54 @@
+{% extends "layouts/organizer.html" %}
+
+{% block scripts %}
+  <script>
+    let studentList = new DataTable("#student-list");
+    let invitedStudents = new DataTable("#invited-students");
+
+    function addHandlers() {
+      const inviteStudentButtons = $("a[role='button'].badge");
+      inviteStudentButtons.on("click", handleClick);
+    }
+
+    function updateUI(content) {
+      studentList.destroy();
+      invitedStudents.destroy();
+      $("#invitation-control").html(content);
+      studentList = new DataTable("#student-list");
+      invitedStudents = new DataTable("#invited-students");
+      addHandlers();
+    }
+
+    async function handleClick(e) {
+      e.preventDefault();
+
+      const studentId = $(this).data("id");
+      const formData = new FormData();
+
+      formData.append("student_id", studentId);
+
+      const response = await fetch(window.location.href, {
+        method: $(this).data("action"),
+        headers: {
+          "X-CSRFToken": "{{ csrf_token() }}",
+        },
+        body: formData,
+      });
+
+      const content = await response.text();
+      updateUI(content);
+    }
+
+    $(document).ready(addHandlers());
+  </script>
+{% endblock %}
+
+{% block content %}
+  <a
+    href="{{ url_for('events.show', event_id=event.id) }}"
+    class="btn btn-secondary">
+    Return to Event
+  </a>
+  <h2 class="h4 mt-3 fw-bold">{{ event.name }}</h2>
+  <div class="control">{% include "events/invitation-control.html" %}</div>
+{% endblock %}

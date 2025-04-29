@@ -1,0 +1,43 @@
+{% extends "layouts/admin.html" %}
+
+{% block scripts %}
+  <script>
+    new DataTable("#departments-table");
+  </script>
+{% endblock %}
+
+{% block content %}
+  <div class="d-flex align-items-end justify-content-between">
+    <h2 class="h4 mb-0 fw-bold">Department Management</h2>
+    <a href="{{ url_for('admin.departments.create') }}" class="btn btn-primary">
+      New Department
+    </a>
+  </div>
+
+  <div class="table-responsive mt-3">
+    <table id="departments-table" class="data-table table">
+      <thead>
+        <tr>
+          <th>Department Name</th>
+          <th class="text-end">Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for department in departments %}
+          <tr>
+            <td>{{ department.name }}</td>
+            <td class="text-end">
+              <a href="{{ url_for('admin.departments.edit', department_id=department.id) }}" class="btn btn-sm btn-warning">
+                Edit
+              </a>
+              <form method="post" action="{{ url_for('admin.departments.delete', department_id=department.id) }}" style="display:inline;" onsubmit="return confirm('Are you sure you want to delete this department?');">
+                {{ delete_form.hidden_tag() }}
+                <button type="submit" class="btn btn-sm btn-danger">Delete</button>
+              </form>
+            </td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+{% endblock %}

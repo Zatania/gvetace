@@ -1,0 +1,45 @@
+{% extends "layouts/admin.html" %}
+
+{% block scripts %}
+  <script>
+    new DataTable("#student-table");
+  </script>
+{% endblock %}
+
+{% block content %}
+  <div class="d-flex align-items-end justify-content-between">
+    <h2 class="h4 mb-0 fw-bold">Student Management</h2>
+    <a href="{{ url_for('admin.students.create') }}" class="btn btn-primary">
+      New Student
+    </a>
+  </div>
+
+  <div class="table-responsive mt-3">
+    <table id="student-table" class="table">
+      <thead>
+        <tr>
+          <th>Student Name</th>
+          <th>Department</th>
+          <th>Email Address</th>
+          <th class="text-end">Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for student in students %}
+          <tr>
+            <td>{{ student.full_name }}</td>
+            <td>{{ student.department.name }}</td>
+            <td>{{ student.user.email }}</td>
+            <td class="text-end">
+              <a href="{{ url_for('admin.students.edit', student_id=student.id) }}" class="btn btn-sm btn-warning">Edit</a>
+              <form action="{{ url_for('admin.students.delete', student_id=student.id) }}" method="POST" style="display:inline;" onsubmit="return confirm('Are you sure?');">
+                {{ delete_form.hidden_tag() }}
+                <button type="submit" class="btn btn-sm btn-danger">Delete</button>
+              </form>
+            </td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+{% endblock %}

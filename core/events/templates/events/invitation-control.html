@@ -1,0 +1,61 @@
+<div id="invitation-control">
+  <h6 class="h5 mt-3">Invited Students</h6>
+  <div class="table-responsive mb-4">
+    <table id="invited-students" class="table w-100">
+      <thead>
+        <tr>
+          <th>Full Name</th>
+          <th class="text-end">Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for student in event.students %}
+          <tr>
+            <td>{{ student.full_name }}</td>
+            <td class="text-end">
+              <a
+                href="#"
+                role="button"
+                class="badge text-bg-danger text-decoration-none"
+                data-action="delete"
+                data-id="{{ student.id }}">
+                Remove
+              </a>
+            </td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  <hr />
+
+  <h6 class="h5 mt-3">Student List</h6>
+  <table id="student-list" class="table">
+    <thead>
+      <tr>
+        <th>Full Name</th>
+        <th class="text-end">Action</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for student in students %}
+        {% if not student in event.students %}
+          <tr>
+            <td>{{ student.full_name }}</td>
+            <td class="text-end">
+              <a
+                href="#"
+                role="button"
+                class="badge text-bg-success text-decoration-none"
+                data-action="post"
+                data-id="{{ student.id }}">
+                Invite
+              </a>
+            </td>
+          </tr>
+        {% endif %}
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
