@@ -1,4 +1,4 @@
-{% extends "layouts/organizer.html" %}
+{% extends "layouts/admin.html" %}
 
 {% block scripts %}
   <script>
@@ -10,26 +10,27 @@
     });
   </script>
   <script>
-    const defaultView = [8.169174349999999, 126.00448117054435];
-    const map = L.map("map").setView(defaultView, 17);
+    // grab your saved lat/lng from Jinja
+    const lat = parseFloat("{{ event.latitude }}");
+    const lng = parseFloat("{{ event.longitude }}");
+
+    // init map *at* the event coords
+    const map = L.map("map").setView([lat, lng], 17);
+
     L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", {
       maxZoom: 19,
       attribution:
         '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>',
     }).addTo(map);
-    L.marker(
-      [parseFloat("{{ event.latitude }}"), parseFloat("{{ event.longitude }}")],
-      17
-    ).addTo(map);
-    circle = L.circle(
-      [parseFloat("{{ event.latitude }}"), parseFloat("{{ event.longitude }}")],
-      {
-        color: "blue",
-        fillColor: "#0033ff",
-        fillOpacity: 0.5,
-        radius: 10,
-      }
-    ).addTo(map);
+
+    // now drop a marker & circle
+    L.marker([lat, lng]).addTo(map);
+    L.circle([lat, lng], {
+      color: "blue",
+      fillColor: "#0033ff",
+      fillOpacity: 0.5,
+      radius: 10,
+    }).addTo(map);
   </script>
 {% endblock %}
 
@@ -78,6 +79,11 @@
             <button type="submit" class="btn btn-primary">Add Organizers</button>
           </div>
         </form>
+        <a
+          href="{{ url_for('events.edit', event_id=event.id) }}"
+          class="btn mt-3 btn-warning">
+          Edit Event
+        </a>
         <a
           href="{{ url_for('events.student_list', event_id=event.id) }}"
           class="btn mt-3 btn-success">

@@ -1,4 +1,4 @@
-{% extends "layouts/organizer.html" %}
+{% extends "layouts/admin.html" %}
 
 {% block scripts %}
   <script>
@@ -63,10 +63,15 @@
     form.addEventListener("submit", function (event) {
       event.preventDefault();
 
+      if (!marker) {
+        // bring up the Bootstrap alert you already have in the template
+        document.querySelector(".alert-danger").textContent =
+          "🚩 Please click on the map to select a location before creating the event.";
+        return;
+      }
+
       const formData = new FormData(event.target);
       formData.append("radius", 10);
-
-      if (!marker) return;
       formData.append("longitude", marker._latlng.lng);
       formData.append("latitude", marker._latlng.lat);
 

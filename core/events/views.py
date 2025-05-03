@@ -1,4 +1,5 @@
 import flask
+from flask_wtf.csrf import generate_csrf
 import sqlalchemy as sa
 from marshmallow.exceptions import ValidationError
 from sqlalchemy_mixins.activerecord import ModelNotFoundError
@@ -42,6 +43,25 @@ def store():
     else:
         return flask.jsonify(EventSchema().dump(event))
 
+@blueprint.route("/<event_id>/edit", methods=["GET", "POST"])
+def edit(event_id: str):
+    # Fetch the event or 404
+    event: Event = Event.find_or_fail(event_id)
+
+    if flask.request.method == "POST":
+        try:
+            # Merge form + geometry into payload
+            form_data = flask.request.form.to_dict()
+            payload = EventSchema().load(form_data)
+            # Apply changes
+            event.update(**payload)
+        except ValidationError as err:
+            return flask.jsonify(err.messages), 422
+        else:
+            return flask.jsonify(EventSchema().dump(event))
+
+    # GET → render the form with existing attributes
+    return flask.render_template("events/edit.html", event=event)
 
 @blueprint.route("/<event_id>", methods=["GET", "POST"])
 def show(event_id: str):
@@ -57,6 +77,15 @@ def show(event_id: str):
 
     return flask.render_template("events/show.html", **context)
 
+@blueprint.route("/<event_id>/delete", methods=["POST"])
+def delete(event_id: str):
+    try:
+        event = Event.find_or_fail(event_id)
+        event.delete()
+        flask.flash("Event deleted successfully.", "success")
+    except ModelNotFoundError:
+        flask.flash("Event not found.", "danger")
+    return flask.redirect(flask.url_for("events.index"))
 
 @blueprint.route("/<event_id>/students", methods=["GET", "POST", "DELETE"])
 def student_list(event_id: str):
