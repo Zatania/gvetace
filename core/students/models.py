@@ -67,24 +67,18 @@ class Attendance(BaseModel):
 
     @property
     def status(self):
-        # 1 - Present
-        # 2 - Present (no time-out)
-        # 3 - Late
-        # 4 - Absent
-
-        # Make this datetime aware (UTC for consistency)
-        combined_datetime = datetime.combine(self.event.date, self.event.time_in)
-        combined_datetime = combined_datetime.replace(tzinfo=timezone.utc)
-
-        late_threshold = combined_datetime + timedelta(minutes=15)
+        # Build the event start and threshold as naïve datetimes
+        event_start = datetime.combine(self.event.date, self.event.time_in)
+        late_threshold = event_start + timedelta(minutes=15)
 
         if not self.time_in:
             return 4  # Absent
 
-        if self.time_in > late_threshold and self.time_out:
-            return 1  # Present
-        elif self.time_in > late_threshold and not self.time_out:
-            return 2  # Present, no time-out
+        # Now both sides are naïve
+        if self.time_in <= late_threshold:
+            return 1  # Present on time
+        elif self.time_in > late_threshold and self.time_out:
+            return 2  # Present but no timeout
         else:
             return 3  # Late
     @property

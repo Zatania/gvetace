@@ -34,9 +34,8 @@ class CreateStudentForm(FlaskForm):
         if user and (not self.current_user or user.id != self.current_user.id):
             raise ValidationError("Email address is already in use")
 
-    def validate(self):
-        # Custom password check
-        rv = super().validate()
+    def validate(self, extra_validators=None):
+        rv = super().validate(extra_validators=extra_validators)
         if not rv:
             return False
 
@@ -44,7 +43,9 @@ class CreateStudentForm(FlaskForm):
             if self.password.data != self.password_confirmation.data:
                 self.password_confirmation.errors.append("Passwords must match")
                 return False
+
         return True
+
 
 class DeleteForm(FlaskForm):
     """Empty form just to get a CSRF token."""

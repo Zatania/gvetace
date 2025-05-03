@@ -45,12 +45,19 @@ def time_in(event_id: str):
             student_image = face_recognition.load_image_file(student.face_image)
             submitted_image = face_recognition.load_image_file(file)
 
-            student_encoding = face_recognition.face_encodings(student_image)[0]
-            submitted_encoding = face_recognition.face_encodings(submitted_image)[0]
-
-            if not submitted_encoding:
-                flask.flash("No face detected in the submitted image. Please try again with a clearer photo.", "danger")
+            student_encodings = face_recognition.face_encodings(student_image)
+            if not student_encodings:
+                flask.flash("No face detected in the reference image. Please contact admin.", "danger")
                 return flask.render_template("students/time_in.html", event=event)
+
+            student_encoding = student_encodings[0]
+            submitted_encodings = face_recognition.face_encodings(submitted_image)
+
+            if not submitted_encodings:
+                flask.flash("No face detected in the submitted image. Please try again with a clearer photo.", "danger")
+                return flask.render_template("students/time_out.html", event=event)
+
+            submitted_encoding = submitted_encodings[0]
 
             result = face_recognition.compare_faces([student_encoding], submitted_encoding)[0]
             if not result:
@@ -78,6 +85,10 @@ def time_out(event_id: str):
     student: Student = Student.where(user_id=current_user.id).first()
     attendance = Attendance.where(student_id=student.id, event_id=event.id).first()
 
+    if not attendance or not attendance.time_in:
+        flask.flash("You must time in before you can time out.", "danger")
+        return flask.render_template("students/time_out.html", event=event, disable_form=True)
+
     if attendance and attendance.time_out:
         flask.flash("Time-out already recorded.", "info")
         return flask.render_template("students/time_out.html", event=event, disable_form=True)
@@ -99,12 +110,18 @@ def time_out(event_id: str):
             student_image = face_recognition.load_image_file(student.face_image)
             submitted_image = face_recognition.load_image_file(file)
 
-            student_encoding = face_recognition.face_encodings(student_image)[0]
-            submitted_encoding = face_recognition.face_encodings(submitted_image)[0]
-
-            if not submitted_encoding:
-                flask.flash("No face detected in the submitted image. Please try again with a clearer photo.", "danger")
+            student_encodings = face_recognition.face_encodings(student_image)
+            if not student_encodings:
+                flask.flash("No face detected in the reference image. Please contact admin.", "danger")
                 return flask.render_template("students/time_in.html", event=event)
+
+            student_encoding = student_encodings[0]
+            submitted_encodings = face_recognition.face_encodings(submitted_image)
+            if not submitted_encodings:
+                flask.flash("No face detected in the submitted image. Please try again with a clearer photo.", "danger")
+                return flask.render_template("students/time_out.html", event=event)
+
+            submitted_encoding = submitted_encodings[0]
 
             result = face_recognition.compare_faces([student_encoding], submitted_encoding)[0]
             if not result:
