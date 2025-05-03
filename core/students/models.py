@@ -1,5 +1,6 @@
 import os
 from datetime import datetime, timedelta, timezone
+import pytz
 
 import sqlalchemy as sa
 from sqlalchemy.orm import relationship
@@ -7,6 +8,7 @@ from sqlalchemy.orm import relationship
 from core.auth.models import User
 from core.config import Config
 from core.models import BaseModel
+MANILA = pytz.timezone("Asia/Manila")
 
 
 class Student(BaseModel):
@@ -69,15 +71,45 @@ class Attendance(BaseModel):
         # 2 - Present (no time-out)
         # 3 - Late
         # 4 - Absent
+
+        # Make this datetime aware (UTC for consistency)
         combined_datetime = datetime.combine(self.event.date, self.event.time_in)
+        combined_datetime = combined_datetime.replace(tzinfo=timezone.utc)
+
         late_threshold = combined_datetime + timedelta(minutes=15)
 
         if not self.time_in:
-            return 4
+            return 4  # Absent
 
         if self.time_in > late_threshold and self.time_out:
-            return 1
+            return 1  # Present
         elif self.time_in > late_threshold and not self.time_out:
-            return 2
+            return 2  # Present, no time-out
         else:
-            return 3
+            return 3  # Late
+    @property
+    def student_name(self):
+        """
+        Returns the student's full name if the User exists,
+        otherwise returns 'Student Deleted'.
+        """
+        # if the related Student or its User has been deleted,
+        # self.student or self.student.user could be None
+        if self.student and self.student.user:
+            u = self.student.user
+            return f"{u.first_name} {u.last_name}"
+        return "Student Deleted"
+
+    @property
+    def time_in_local(self) -> str | None:
+        """Asia/Manila datetime in 12-hour format."""
+        if not self.time_in:
+            return None
+        return self.time_in.astimezone(MANILA).strftime("%B %d, %Y %I:%M:%S %p")
+
+    @property
+    def time_out_local(self) -> str | None:
+        """Asia/Manila datetime in 12-hour format."""
+        if not self.time_out:
+            return None
+        return self.time_out.astimezone(MANILA).strftime("%B %d, %Y %I:%M:%S %p")

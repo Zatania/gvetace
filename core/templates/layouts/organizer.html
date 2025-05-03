@@ -75,7 +75,10 @@
     <header class="navbar sticky-top bg-dark flex-md-nowrap p-0 shadow">
       <a
         class="navbar-brand col-md-3 col-lg-2 me-0 px-3 fs-5 fw-bold text-white"
-        href="#">
+        href="{{ url_for(
+          'admin.organizers.organizer_events',
+          organizer_id=current_user.organizer.id
+        ) }}">
         Gvetace
       </a>
 
@@ -157,8 +160,11 @@
               <ul class="nav flex-column">
                 <li class="nav-item">
                   <a
-                    class="nav-link d-flex align-items-center gap-2"
-                    href="{{ url_for('events.index') }}">
+                    class="nav-link d-flex align-items-center gap-2 active"
+                    href="{{ url_for(
+                        'admin.organizers.organizer_events',
+                        organizer_id=current_user.organizer.id
+                      ) }}">
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
                       width="24"

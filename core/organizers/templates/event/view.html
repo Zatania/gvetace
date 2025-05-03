@@ -1,0 +1,74 @@
+{% extends "layouts/organizer.html" %}
+
+{% block scripts %}
+  <script>
+    // grab your saved lat/lng from Jinja
+    const lat = parseFloat("{{ event.latitude }}");
+    const lng = parseFloat("{{ event.longitude }}");
+
+    // init map *at* the event coords
+    const map = L.map("map").setView([lat, lng], 17);
+
+    L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", {
+      maxZoom: 19,
+      attribution:
+        '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>',
+    }).addTo(map);
+
+    // now drop a marker & circle
+    L.marker([lat, lng]).addTo(map);
+    L.circle([lat, lng], {
+      color: "blue",
+      fillColor: "#0033ff",
+      fillOpacity: 0.5,
+      radius: 10,
+    }).addTo(map);
+  </script>
+{% endblock %}
+
+{% block content %}
+  <div class="row">
+    <header class="col-md-6">
+      <h2 class="h4 fw-bold">{{ event.name }}</h2>
+      <p class="mb-0">
+        <span class="fw-bold">Venue</span>: {{ event.address }}
+      </p>
+      <p class="mb-0"><span class="fw-bold">Date</span>: {{ event.date }}</p>
+      <p class="mb-0">
+        <span class="fw-bold">Time</span>
+        : {{ event.time_in }} - {{ event.time_out }}
+      </p>
+      <p>
+        <span class="fw-bold">Attendees</span>:
+        {{ event.students.all()|length }} student
+      </p>
+
+      <div>
+        <a href="{{ url_for(
+            'admin.organizers.organizer_events',
+            organizer_id=current_user.organizer.id
+          ) }}" class="btn mt-3 btn-secondary">
+          Cancel
+        </a>
+        <!-- <a
+          href="{{ url_for('events.edit', event_id=event.id) }}"
+          class="btn mt-3 btn-warning">
+          Edit Event
+        </a>
+        <a
+          href="{{ url_for('admin.organizers.student_list', event_id=event.id, organizer_id=current_user.organizer.id) }}"
+          class="btn mt-3 btn-success">
+          Open Student List
+        </a> -->
+        <a
+          href="{{ url_for('admin.organizers.attendance_list', event_id=event.id, organizer_id=current_user.organizer.id) }}"
+          class="btn mt-3 btn-dark">
+          View Attendance
+        </a>
+      </div>
+    </header>
+    <div class="col-md-6">
+      <div id="map" class="mt-2 rounded" style="height: 400px"></div>
+    </div>
+  </div>
+{% endblock %}

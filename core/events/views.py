@@ -26,8 +26,8 @@ def index():
     events = Event.all()
     return flask.render_template("events/index.html", events=events)
 
-
 @blueprint.route("/create")
+
 def create():
     return flask.render_template("events/create.html")
 

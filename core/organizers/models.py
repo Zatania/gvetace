@@ -20,8 +20,19 @@ class Organizer(BaseModel):
         nullable=False,
     )
 
-    user = relationship("User", uselist=False)
+    user = relationship(
+        "User",
+        uselist=False,
+        back_populates="organizer",
+    )
     department = relationship("Department")
+
+    events = relationship(
+        "Event",
+        secondary="event_organizer",
+        lazy="dynamic",
+        back_populates="organizers",
+    )
 
     def __repr__(self):
         return self.full_name

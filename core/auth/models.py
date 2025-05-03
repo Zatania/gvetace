@@ -3,6 +3,7 @@ from flask_login import UserMixin
 
 from core.models import BaseModel
 from core.services import login_manager
+from sqlalchemy.orm import relationship
 
 
 class User(BaseModel, UserMixin):
@@ -13,6 +14,13 @@ class User(BaseModel, UserMixin):
     email = sa.Column(sa.String(255), unique=True, nullable=False)
     password = sa.Column(sa.String(128), nullable=False)
     role = sa.Column(sa.Integer, nullable=False)
+
+    # ← add this line:
+    organizer = relationship(
+        "Organizer",
+        uselist=False,
+        back_populates="user",
+    )
 
 
 @login_manager.user_loader

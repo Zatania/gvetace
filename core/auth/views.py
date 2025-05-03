@@ -5,6 +5,7 @@ from werkzeug.security import check_password_hash
 
 from .forms import LoginForm
 from .models import User
+from core.organizers.models import Organizer
 
 blueprint = flask.Blueprint(
     "auth",
@@ -44,7 +45,13 @@ def handle_redirect():
     if user.role == 1:
         return flask.redirect(flask.url_for("admin.dashboard"))
     if user.role == 2:
-        return flask.redirect(flask.url_for("events.index"))
+        # assuming User → Organizer is a one-to-one relationship
+        org = Organizer.where(user_id=user.id).first()
+        if not org:
+            flask.abort(404)
+        return flask.redirect(
+            flask.url_for("admin.organizers.organizer_events", organizer_id=org.id)
+        )
     if user.role == 3:
         return flask.redirect(flask.url_for("students.event_list"))
 

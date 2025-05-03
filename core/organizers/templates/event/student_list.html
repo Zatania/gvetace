@@ -1,0 +1,34 @@
+{% extends "layouts/organizer.html" %}
+
+{% block scripts %}
+  <script>
+    let invitedStudents = new DataTable("#invited-students");
+
+    function addHandlers() {
+      const inviteStudentButtons = $("a[role='button'].badge");
+      inviteStudentButtons.on("click", handleClick);
+    }
+
+    function updateUI(content) {
+      invitedStudents.destroy();
+      $("#invitation-control").html(content);
+      invitedStudents = new DataTable("#invited-students");
+      addHandlers();
+    }
+
+    $(document).ready(addHandlers());
+  </script>
+{% endblock %}
+
+{% block content %}
+  <a
+    href="{{ url_for(
+      'admin.organizers.organizer_events',
+      organizer_id=current_user.organizer.id
+    ) }}" class="btn mt-3 btn-secondary"
+    class="btn btn-secondary">
+    Return to Event
+  </a>
+  <h2 class="h4 mt-3 fw-bold">{{ event.name }}</h2>
+  <div class="control">{% include "event/invitation-control.html" %}</div>
+{% endblock %}

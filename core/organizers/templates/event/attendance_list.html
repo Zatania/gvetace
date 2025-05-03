@@ -1,0 +1,94 @@
+{% extends "layouts/organizer.html" %}
+
+{% block scripts %}
+  <script>
+    let invitedStudents = new DataTable("#invited-students");
+
+    function addHandlers() {
+      const inviteStudentButtons = $("a[role='button'].badge");
+      inviteStudentButtons.on("click", handleClick);
+    }
+
+    function updateUI(content) {
+      invitedStudents.destroy();
+      $("#invitation-control").html(content);
+      invitedStudents = new DataTable("#invited-students");
+      addHandlers();
+    }
+
+    $(document).ready(addHandlers());
+  </script>
+{% endblock %}
+
+{% block content %}
+  <div class="d-flex justify-content-between mb-3">
+    <a
+      href="{{ url_for(
+        'admin.organizers.organizer_events',
+        organizer_id=current_user.organizer.id
+      ) }}"
+      class="btn btn-secondary"
+    >
+      Return to Event
+    </a>
+    <a
+      href="{{ url_for(
+        'admin.organizers.attendance_csv',
+        organizer_id=current_user.organizer.id,
+        event_id=event.id
+      ) }}"
+      class="btn btn-primary"
+    >
+      Download CSV
+    </a>
+  </div>
+  <div class="d-flex justify-content-end mb-3">
+  </div>
+  <h2 class="h4 mt-3 fw-bold">{{ event.name }}</h2>
+  <div class="control">
+    <div id="invitation-control">
+      <h6 class="h5 mt-3">Attendance List</h6>
+      <div class="table-responsive mb-4">
+        <table id="invited-students" class="table w-100">
+          <thead>
+            <tr>
+              <th>Full Name</th>
+              <th>Time In</th>
+              <th>Time Out</th>
+              <th>Status</th>
+              <th>Verification Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for attendance in attendance_records %}
+              <tr>
+                <td
+                  {% if not (attendance.student and attendance.student.user) %}
+                    class="text-danger"
+                  {% endif %}
+                >
+                  {{ attendance.student_name }}
+                </td>
+                <td>{{ attendance.time_in_local or "—" }}</td>
+                <td>{{ attendance.time_out_local or "—" }}</td>
+                <td>
+                  {% if attendance.status == 1 %}
+                    Present
+                  {% elif attendance.status == 2 %}
+                    Present (No time-out)
+                  {% elif attendance.status == 3 %}
+                    Late
+                  {% else %}
+                    Absent
+                  {% endif %}
+                </td>
+                <td>Verified</td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+      </div>
+    </div>
+  </div>
+{% endblock %}
