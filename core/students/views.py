@@ -30,10 +30,7 @@ def time_in(event_id: str):
 
     if flask.request.method == "POST":
         file = flask.request.files["time_in_image"]
-        try:
-            coords = geotag.extract_coords(file)
-        except KeyError:
-            coords = None
+        coords = geotag.extract_coords(file)
 
         if coords is None:
             flask.flash("Image does not contain location data. Please enable location tagging in your camera.", "danger")
@@ -42,6 +39,8 @@ def time_in(event_id: str):
         if geotag.within_radius(
             (event.latitude, event.longitude), coords, event.radius
         ):
+            # rewind so face_recognition actually sees the image
+            file.stream.seek(0)
             student_image = face_recognition.load_image_file(student.face_image)
             submitted_image = face_recognition.load_image_file(file)
 
@@ -95,10 +94,7 @@ def time_out(event_id: str):
 
     if flask.request.method == "POST":
         file = flask.request.files["time_out_image"]
-        try:
-            coords = geotag.extract_coords(file)
-        except KeyError:
-            coords = None
+        coords = geotag.extract_coords(file)
 
         if coords is None:
             flask.flash("Image does not contain location data. Please enable location tagging in your camera.", "danger")
@@ -107,6 +103,8 @@ def time_out(event_id: str):
         if geotag.within_radius(
             (event.latitude, event.longitude), coords, event.radius
         ):
+            # rewind so face_recognition actually sees the image
+            file.stream.seek(0)
             student_image = face_recognition.load_image_file(student.face_image)
             submitted_image = face_recognition.load_image_file(file)
 

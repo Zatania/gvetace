@@ -13,17 +13,15 @@ def decimal_coords(coords, ref):
 
 def extract_coords(file: FileStorage):
     image = Image(file)
-    coords = (
-        decimal_coords(
-            image.gps_latitude,
-            image.gps_latitude_ref,
-        ),
-        decimal_coords(
-            image.gps_longitude,
-            image.gps_longitude_ref,
-        ),
-    )
-    return coords
+    required = ("gps_latitude", "gps_latitude_ref",
+                "gps_longitude", "gps_longitude_ref")
+
+    if any(not hasattr(image, tag) for tag in required):
+        return None
+
+    lat = decimal_coords(image.gps_latitude, image.gps_latitude_ref)
+    lon = decimal_coords(image.gps_longitude, image.gps_longitude_ref)
+    return (lat, lon)
 
 
 def haversine_distance(lat1, lon1, lat2, lon2):
