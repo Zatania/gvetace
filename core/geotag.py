@@ -5,22 +5,19 @@ from werkzeug.datastructures import FileStorage
 
 
 def decimal_coords(coords, ref):
-    decimal_degrees = coords[0] + coords[1] / 60 + coords[2] / 3600
-    if ref == "S" or ref == "W":
-        decimal_degrees = -decimal_degrees
-    return decimal_degrees
+    dd = coords[0] + coords[1] / 60 + coords[2] / 3600
+    return -dd if ref in ("S", "W") else dd
 
 
 def extract_coords(file: FileStorage):
     image = Image(file)
-    required = ("gps_latitude", "gps_latitude_ref",
-                "gps_longitude", "gps_longitude_ref")
-
-    if any(not hasattr(image, tag) for tag in required):
+    try:
+        lat = decimal_coords(image.gps_latitude,  image.gps_latitude_ref)
+        lon = decimal_coords(image.gps_longitude, image.gps_longitude_ref)
+    except (AttributeError, KeyError):
+        # either tag missing or no APP1 segment → no GPS data
         return None
 
-    lat = decimal_coords(image.gps_latitude, image.gps_latitude_ref)
-    lon = decimal_coords(image.gps_longitude, image.gps_longitude_ref)
     return (lat, lon)
 
 
