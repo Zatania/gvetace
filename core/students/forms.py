@@ -26,7 +26,7 @@ class CreateStudentForm(FlaskForm):
     )
     profile = FileField(
         "Profile",
-        validators=[FileAllowed(["jpg", "png"], "Please upload an image")],
+        validators=[FileAllowed(["jpg", "png", "jpeg"], "Please upload an image")],
     )
 
     def validate_email(self, email: wtf.FormField):

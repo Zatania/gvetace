@@ -29,7 +29,10 @@ def time_in(event_id: str):
         return flask.render_template("students/time_in.html", event=event, disable_form=True)
 
     if flask.request.method == "POST":
-        file = flask.request.files["time_in_image"]
+        # safe-get the upload and ensure it’s non-empty
+        file = flask.request.files.get("time_in_image")
+        if not file or file.filename == "":
+            flask.flash("No image provided. Please choose a photo to submit.", "danger")
         coords = geotag.extract_coords(file)
 
         if coords is None:
@@ -93,7 +96,10 @@ def time_out(event_id: str):
         return flask.render_template("students/time_out.html", event=event, disable_form=True)
 
     if flask.request.method == "POST":
-        file = flask.request.files["time_out_image"]
+        # safe-get the upload and ensure it’s non-empty
+        file = flask.request.files.get("time_out_image")
+        if not file or file.filename == "":
+            flask.flash("No image provided. Please choose a photo to submit.", "danger")
         coords = geotag.extract_coords(file)
 
         if coords is None:
