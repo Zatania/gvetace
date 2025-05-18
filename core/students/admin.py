@@ -46,14 +46,15 @@ def create():
 
         profile = flask.request.files["profile"]
         extension = profile.filename.split(".")[-1]
-        filename = f"{user.first_name.lower()}_{user.last_name.lower()}"
+        filename = f"{user.first_name.lower()}_{user.last_name.lower()}.{extension}"
         profile.save(
             os.path.join(
                 Config.BASE_DIR,
                 "uploads",
-                f"{filename}.{extension}",
+                filename,
             )
         )
+        Student.create(user_id=user.id, department_id=department.id, profile=filename)
 
         Student.create(user_id=user.id, department_id=department.id, profile=filename)
         flask.flash("Student account created successfully", "success")

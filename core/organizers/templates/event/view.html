@@ -65,6 +65,11 @@
           class="btn mt-3 btn-dark">
           View Attendance
         </a>
+        <a
+          href="{{ url_for('admin.organizers.density', event_id=event.id, organizer_id=current_user.organizer.id) }}"
+          class="btn mt-3 btn-dark">
+          View Density
+        </a>
       </div>
     </header>
     <div class="col-md-6">

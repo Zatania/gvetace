@@ -1,0 +1,38 @@
+{% extends "layouts/organizer.html" %}
+
+{% block scripts %}
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script>
+    const ctx = document.getElementById("chart");
+    new Chart(ctx, {
+      type: "bar",
+      data: {
+        labels: {{ names|tojson }},
+        datasets: [
+          {
+            label: "{{ event.name }}",
+            data: {{ attendances|tojson }},
+            borderWidth: 1,
+          },
+        ],
+      },
+      options: {
+        scales: {
+          y: {
+            beginAtZero: true,
+          },
+        },
+      },
+    });
+  </script>
+{% endblock %}
+
+{% block content %}
+  <div class="event-info mb-4 p-4 bg-light rounded border">
+    <h2>{{ event.name }}</h2>
+    <p><strong>Location:</strong> {{ event.address }}</p>
+    <p><strong>Time In:</strong> {{ event.time_in.strftime('%I:%M %p') }}</p>
+    <p><strong>Time Out:</strong> {{ event.time_out.strftime('%I:%M %p') }}</p>
+  </div>
+  <canvas id="chart"></canvas>
+{% endblock %}

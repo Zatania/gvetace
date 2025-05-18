@@ -3,6 +3,7 @@ import csv
 import io
 from flask import Response
 from sqlalchemy.exc import IntegrityError
+from sqlalchemy import func
 from werkzeug.security import generate_password_hash
 from werkzeug.exceptions import abort
 from werkzeug.utils import secure_filename
@@ -118,7 +119,39 @@ def attendance_list(organizer_id: int, event_id: int):
         attendance_records=attendance_records,
     )
 
+@blueprint.route("/<int:organizer_id>/events/<int:event_id>/density", methods=["GET"])
+def density(organizer_id: int, event_id: int):
+    # make sure organizer & event exist and belong together
+    organizer = Organizer.get_by_id(organizer_id) or flask.abort(404)
+    event = Event.find_or_fail(event_id)
+    if not organizer.events.filter_by(id=event.id).first():
+        flask.abort(404)
 
+    # aggregate attendance by department
+    # Attendance → Student → Department
+    session = Attendance.query.session  # or however you get your Session
+    results = (
+        session.query(
+            Department.name.label("dept"),
+            func.count(Attendance.id).label("cnt"),
+        )
+        .join(Student, Student.id == Attendance.student_id)
+        .join(Department, Department.id == Student.department_id)
+        .filter(Attendance.event_id == event.id)
+        .group_by(Department.name)
+        .order_by(Department.name)
+        .all()
+    )
+
+    names = [r.dept for r in results]
+    attendances = [r.cnt for r in results]
+
+    return flask.render_template(
+        "event/density.html",  # or wherever you put density.html
+        event=event,
+        names=names,
+        attendances=attendances,
+    )
 
 @blueprint.route("/create", methods=["GET", "POST"])
 def create():
